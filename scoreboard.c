@@ -1,24 +1,18 @@
 #include <reg51.h>
 #include "led.h"
 #include "key.h"
+#include "game.h"
 
 sbit beep = P2 ^ 3; //蜂鸣器
 
-
-//比分记录
-unsigned int ScoreRed;  //红方分数
-unsigned int ScoreBlue; //蓝方分数
-
 /**
- * 赛场设定
- */
-//总场次
-//获胜场次
-//当前发球权
-//每次连续发球次数
-//
+ * 赛场状态
+*/
+// //比分记录
+// unsigned int ScoreRed;  //红方分数
+// unsigned int ScoreBlue; //蓝方分数
 
-
+struct Game curGame;
 
 //延时1ms
 void Delay(unsigned int ii)
@@ -36,36 +30,36 @@ void Delay500(unsigned int iii)
 			;
 }
 
-/**
- * 比分计算及胜负逻辑等
-*/
-void ScoreUp(unsigned int *s)
-{
-	++*s;
-	//TODO: 判断比分是否达到胜利
+// /**
+//  * 比分计算及胜负逻辑等
+// */
+// void ScoreUp(unsigned int *s)
+// {
+// 	++*s;
+// 	//TODO: 判断比分是否达到胜利
 
-	//TODO: 判断回合是否达到结束
-}
+// 	//TODO: 判断回合是否达到结束
+// }
 
 /** 
  * 渲染数码管
 */
 void RenderLED()
 {
-	P0 = LEDDis[ScoreRed / 10];
+	P0 = LEDDis[curGame.gameStatus.Player1Score / 10];
 	LED4 = 0;
 	Delay500(5);
 	LED4 = 1;
-	P0 = LEDDis[ScoreRed % 10];
+	P0 = LEDDis[curGame.gameStatus.Player1Score % 10];
 	LED3 = 0;
 	Delay500(5);
 	LED3 = 1;
 
-	P0 = LEDDis[ScoreBlue / 10];
+	P0 = LEDDis[curGame.gameStatus.Player2Score / 10];
 	LED2 = 0;
 	Delay500(5);
 	LED2 = 1;
-	P0 = LEDDis[ScoreBlue % 10];
+	P0 = LEDDis[curGame.gameStatus.Player2Score % 10];
 	LED1 = 0;
 	Delay500(5);
 	LED1 = 1;
@@ -114,16 +108,17 @@ void ScanKey()
 	SCANKEY_CHECK(k4);
 }
 
+//处理按键逻辑
 void HandleKey()
 {
 	if (k1 == KEY_PRESS)
 	{
-		ScoreUp(&ScoreRed);
+		curGame.Player1GetScore(&curGame.gameStatus, 1);
 		k1 = KEY_PRESS_HANDLE;
 	}
 	if (k4 == KEY_PRESS)
 	{
-		ScoreUp(&ScoreBlue);
+		curGame.Player2GetScore(&curGame.gameStatus, 1);
 		k4 = KEY_PRESS_HANDLE;
 	}
 }
@@ -142,8 +137,7 @@ void main()
 	TR0 = 1;
 
 	//初始化状态变量
-	ScoreRed = 0;
-	ScoreBlue = 0;
+	GameInit(&curGame);
 
 	while (1)
 		;
@@ -156,8 +150,6 @@ void KeyAndDis_Time0(void) interrupt 1 using 2
 	TL0 = 0xDF; //设定时值为20000us（20ms)
 
 	ScanKey();
-
 	HandleKey();
-
 	RenderLED();
 }
