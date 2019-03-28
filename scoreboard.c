@@ -2,15 +2,16 @@
 #include "led.h"
 #include "key.h"
 #include "game.h"
+#include "pingpong.h"
+
+sbit Player_01 = P1 ^ 1;
+sbit Player_02 = P1 ^ 2;
 
 sbit beep = P2 ^ 3; //蜂鸣器
 
 /**
  * 赛场状态
 */
-// //比分记录
-// unsigned int ScoreRed;  //红方分数
-// unsigned int ScoreBlue; //蓝方分数
 
 struct Game curGame;
 
@@ -29,17 +30,6 @@ void Delay500(unsigned int iii)
 		for (jjj = 0; jjj < 60; jjj++)
 			;
 }
-
-// /**
-//  * 比分计算及胜负逻辑等
-// */
-// void ScoreUp(unsigned int *s)
-// {
-// 	++*s;
-// 	//TODO: 判断比分是否达到胜利
-
-// 	//TODO: 判断回合是否达到结束
-// }
 
 /** 
  * 渲染数码管
@@ -123,6 +113,18 @@ void HandleKey()
 	}
 }
 
+//当前比赛状态检查
+void GameStatusCheck()
+{
+	unsigned int winner = 0;
+
+	if (IsWin(&curGame,&winner))
+	{
+		Player_01 = winner;
+		Player_02 = !winner;
+	}
+}
+
 /**
  * 单片机相关的设置
 */
@@ -137,7 +139,9 @@ void main()
 	TR0 = 1;
 
 	//初始化状态变量
-	GameInit(&curGame);
+	PingPongFactory(&curGame);
+
+	curGame.GameStart(&curGame);
 
 	while (1)
 		;
@@ -151,5 +155,6 @@ void KeyAndDis_Time0(void) interrupt 1 using 2
 
 	ScanKey();
 	HandleKey();
+	GameStatusCheck();
 	RenderLED();
 }
