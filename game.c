@@ -35,12 +35,12 @@ void GameInit(struct Game *gg)
 
 bool IsWin(struct Game *curGame, unsigned int *winner)
 {
-    if (curGame->gameStatus.Player1Score >= curGame->Score2Win && curGame->gameStatus.Player1Score - curGame->gameStatus.Player2Score < curGame->FeverPitchScore)
+    if (curGame->gameStatus.Player1Score >= curGame->Score2Win && curGame->gameStatus.Player2Score < curGame->FeverPitchScore)
     {
         *winner = PLAYER01;
         return true;
     }
-    else if (curGame->gameStatus.Player2Score >= curGame->Score2Win && curGame->gameStatus.Player2Score - curGame->gameStatus.Player1Score < curGame->FeverPitchScore)
+    else if (curGame->gameStatus.Player2Score >= curGame->Score2Win && curGame->gameStatus.Player1Score < curGame->FeverPitchScore)
     {
         *winner = PLAYER02;
         return true;
