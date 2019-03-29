@@ -1,21 +1,21 @@
 #include "game.h"
 #include "pingpong.h"
 
-void PingPongFactory(struct Game *curGame)
+void PingPongFactory(struct Game *gameP)
 {
-    curGame->MaxToPlay = 7;
-    curGame->ToWin = 4;
-    curGame->Score2Win = 11;       //总分11分
-    curGame->FeverPitchScore = 10; //当10平后
-    curGame->Lead4Win = 2;         //需领先2分方可获胜
+    gameP->MaxToPlay = 7;
+    gameP->ToWin = 4;
+    gameP->Score2Win = 11;       //总分11分
+    gameP->FeverPitchScore = 10; //当10平后
+    gameP->Lead4Win = 2;         //需领先2分方可获胜
 
     //方法初始化
-    curGame->GameStart = GameStart;
+    gameP->GameStart = GameStart;
 
-    GameInit(curGame);
+    GameInit(gameP);
 }
 
-void GameStart(struct Game *cGame)
+void GameStart(struct Game *gameP)
 {
     //TODO:判断场地方向
     //TODO:判断发球次序

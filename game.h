@@ -51,7 +51,7 @@ struct Game
     struct GameStatus gameStatus;
 
     //当场是否已分出胜负
-    bool (*IsWin)(struct Game *curGame, unsigned int *winner);
+    //bool (*IsWin)(struct Game *curGame, unsigned int *winner);
     //是否比赛已结束——已达到胜利标准
     bool (*IsEndAll)(struct Game *curGame, unsigned int *winner);
 
@@ -68,7 +68,7 @@ struct Game
     void (*Player2GetScore)(struct GameStatus *gs, unsigned int score);
 
     //开始游戏 —— 处理发球顺序，场地位置等
-    void (*GameStart)(struct GameStatus *gs);
+    void (*GameStart)(struct Game *gs);
 };
 
 #endif

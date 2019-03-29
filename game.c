@@ -30,7 +30,7 @@ void GameInit(struct Game *gg)
     gg->Player1GetScore = Player1GetScore;
     gg->Player2GetScore = Player2GetScore;
 
-    gg->IsWin = IsWin;
+    //gg->IsWin = IsWin;
 }
 
 bool IsWin(struct Game *curGame, unsigned int *winner)
