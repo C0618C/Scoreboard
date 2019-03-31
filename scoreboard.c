@@ -4,8 +4,15 @@
 #include "game.h"
 #include "pingpong.h"
 
-sbit Player_01 = P1 ^ 1;
-sbit Player_02 = P1 ^ 2;
+//这会影响LED亮度
+#define LED_SHOW_TIME 3
+
+sbit Player_01 = P1 ^ 0;
+sbit Player_02 = P1 ^ 1;
+
+sbit SvrB01 = P1 ^ 5;  //玩家1发球
+sbit SvrB02 = P1 ^ 6;  //玩家2发球
+sbit Test_01 = P1 ^ 7; //胜利提示
 
 sbit beep = P2 ^ 3; //蜂鸣器
 
@@ -38,24 +45,24 @@ void RenderLED()
 {
 	P0 = LEDDis[curGame.gameStatus.Player1Score / 10];
 	LED4 = 0;
-	Delay500(5);
+	Delay500(LED_SHOW_TIME);
 	LED4 = 1;
 	P0 = LEDDis[curGame.gameStatus.Player1Score % 10];
 	LED3 = 0;
-	Delay500(5);
+	Delay500(LED_SHOW_TIME);
 	LED3 = 1;
 
 	P0 = LEDDis[curGame.gameStatus.Player2Score / 10];
 	LED2 = 0;
-	Delay500(5);
+	Delay500(LED_SHOW_TIME);
 	LED2 = 1;
 	P0 = LEDDis[curGame.gameStatus.Player2Score % 10];
 	LED1 = 0;
-	Delay500(5);
+	Delay500(LED_SHOW_TIME);
 	LED1 = 1;
 
 	//测试用——用红点显示是否按下按键
-	P0 = LEDDis[12];
+	P0 = LEDDis[0xF + 3];
 	if (k1)
 	{
 		LED4 = 0;
@@ -101,15 +108,28 @@ void ScanKey()
 //处理按键逻辑
 void HandleKey()
 {
-	if (k1 == KEY_PRESS)
+	if ((Player_01 & Player_02) == 1) //没决定胜负时，可以加分
 	{
-		curGame.Player1GetScore(&curGame.gameStatus, 1);
-		k1 = KEY_PRESS_HANDLE;
+		if (k1 == KEY_PRESS)
+		{
+			curGame.Player1GetScore(&curGame.gameStatus, 1);
+			k1 = KEY_PRESS_HANDLE;
+		}
+		if (k4 == KEY_PRESS)
+		{
+			curGame.Player2GetScore(&curGame.gameStatus, 1);
+			k4 = KEY_PRESS_HANDLE;
+		}
 	}
-	if (k4 == KEY_PRESS)
+	else //已决定胜负了，只能按其它按钮
 	{
-		curGame.Player2GetScore(&curGame.gameStatus, 1);
-		k4 = KEY_PRESS_HANDLE;
+		Test_01 = 0;
+		if (K_NEXT_GAME == KEY_PRESS)
+		{
+			curGame.NextGame(&curGame);
+			K_NEXT_GAME = KEY_PRESS_HANDLE;
+			
+		}
 	}
 }
 
@@ -118,10 +138,17 @@ void GameStatusCheck()
 {
 	unsigned int winner = 0;
 
-	if (IsWin(&curGame,&winner))
+	//if (curGame.IsWin(&curGame,&winner))		//这种方式，第二个参数是指针就编译报错。。不知道为何
+	if (GetIsWin(&curGame, &winner))
 	{
 		Player_01 = winner;
 		Player_02 = !winner;
+	}
+	else
+	{
+		//发球指示灯
+		SvrB01 = curGame.gameStatus.HasBallSrv != PLAYER01 ? true : false;
+		SvrB02 = curGame.gameStatus.HasBallSrv != PLAYER02 ? true : false;
 	}
 }
 

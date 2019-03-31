@@ -7,5 +7,6 @@
 void PingPongFactory(struct Game *gameP);
 
 void GameStart(struct Game *gameP);
+void NextGame(struct Game *gameP);
 //bool IsFinish(struct Game *curGame, unsigned int *winner);
 #endif

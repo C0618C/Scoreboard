@@ -6,9 +6,11 @@
 #define PLAYER01 0
 #define PLAYER02 1
 
+struct Game;
+
 unsigned int CountNum(unsigned int score);
 void GameInit(struct Game *gg);
-bool IsWin(struct Game *curGame, unsigned int *winner);
+bool GetIsWin(struct Game *curGame, unsigned int *winner);
 
 struct GameStatus
 {
@@ -29,6 +31,11 @@ struct GameStatus
     unsigned int HasBallSrv;
     //已连续发球次数
     unsigned int BallSrvCount;
+
+    //当前左边玩家
+    unsigned int PlayerOnLeft;
+
+    struct Game *curGameP;
 };
 
 struct Game
@@ -51,7 +58,7 @@ struct Game
     struct GameStatus gameStatus;
 
     //当场是否已分出胜负
-    //bool (*IsWin)(struct Game *curGame, unsigned int *winner);
+    bool (*IsWin)(struct Game *curGame, unsigned int *winner);
     //是否比赛已结束——已达到胜利标准
     bool (*IsEndAll)(struct Game *curGame, unsigned int *winner);
 
@@ -69,6 +76,7 @@ struct Game
 
     //开始游戏 —— 处理发球顺序，场地位置等
     void (*GameStart)(struct Game *gs);
+    //下一场比赛
+    void (*NextGame)(struct  Game *g);
 };
-
 #endif

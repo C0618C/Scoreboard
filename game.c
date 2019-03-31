@@ -13,19 +13,37 @@ unsigned int CountNum(unsigned int score)
     return count;
 }
 
+//得出传入玩家的对手
+unsigned int _AnotherPlayer(unsigned int CurPlayer)
+{
+    return CurPlayer == PLAYER01 ? PLAYER02 : PLAYER01;
+}
+
+//处理每次得分之后的公共逻辑
+void OneScoreUp(struct GameStatus *gs, unsigned int score, unsigned int *playerScore)
+{
+    (*playerScore) += score;
+    ++gs->BallSrvCount;
+
+    if (gs->BallSrvCount >= gs->curGameP->ServerTime)
+    {
+        gs->BallSrvCount = 0;
+        gs->HasBallSrv = _AnotherPlayer(gs->HasBallSrv);
+    }
+}
+
 void Player1GetScore(struct GameStatus *gs, unsigned int score)
 {
-    gs->Player1Score += score;
+    OneScoreUp(gs, score, &(gs->Player1Score));
 }
 void Player2GetScore(struct GameStatus *gs, unsigned int score)
 {
-    gs->Player2Score += score;
+    OneScoreUp(gs, score, &(gs->Player2Score));
 }
 
 void GameInit(struct Game *gg)
 {
-    gg->gameStatus.Player1Score = 0;
-    gg->gameStatus.Player2Score = 0;
+    gg->gameStatus.curGameP = gg;
 
     gg->Player1GetScore = Player1GetScore;
     gg->Player2GetScore = Player2GetScore;
@@ -33,7 +51,7 @@ void GameInit(struct Game *gg)
     //gg->IsWin = IsWin;
 }
 
-bool IsWin(struct Game *curGame, unsigned int *winner)
+bool GetIsWin(struct Game *curGame, unsigned int *winner)
 {
     if (curGame->gameStatus.Player1Score >= curGame->Score2Win && curGame->gameStatus.Player2Score < curGame->FeverPitchScore)
     {
