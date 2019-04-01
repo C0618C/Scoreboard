@@ -77,6 +77,9 @@ struct Game
     //开始游戏 —— 处理发球顺序，场地位置等
     void (*GameStart)(struct Game *gs);
     //下一场比赛
-    void (*NextGame)(struct  Game *g);
+    void (*NextGame)(struct Game *g);
+
+    //赢得一场比赛
+    void (*WinAStage)(struct Game *g);
 };
 #endif

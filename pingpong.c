@@ -28,6 +28,8 @@ void GameStart(struct Game *gameP)
     //判断发球次序
     gameP->gameStatus.HasBallSrv = PLAYER02; //TODO:第一次发球顺序得随机生成
     gameP->gameStatus.BallSrvCount = 0;
+    
+    gameP->gameStatus.PlayCount = 0;
 }
 
 void NextGame(struct Game *gameP)
